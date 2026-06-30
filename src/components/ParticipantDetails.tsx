@@ -72,13 +72,13 @@ function isMatchLocked(m: Match, isAdmin = false): boolean {
   return Date.now() >= kickoffTime - LOCK_BEFORE_KICKOFF_MS;
 }
 
-export function ParticipantDetails({ 
-  participant, 
-  matches, 
-  realResults, 
-  onSavePredictions, 
-  lang, 
-  theme, 
+export function ParticipantDetails({
+  participant,
+  matches,
+  realResults,
+  onSavePredictions,
+  lang,
+  theme,
   isAdmin = false,
   initialMatchId = null
 }: Props) {
@@ -97,15 +97,15 @@ export function ParticipantDetails({
   const groupStandings = useMemo(() => {
     const standings: Record<string, any[]> = {};
     const groupNames = [
-      'Group A', 'Group B', 'Group C', 'Group D', 
-      'Group E', 'Group F', 'Group G', 'Group H', 
+      'Group A', 'Group B', 'Group C', 'Group D',
+      'Group E', 'Group F', 'Group G', 'Group H',
       'Group I', 'Group J', 'Group K', 'Group L'
     ];
-    
+
     groupNames.forEach(gName => {
       standings[gName] = calculateGroupStandings(gName, matches, realResults);
     });
-    
+
     return standings;
   }, [matches, realResults]);
 
@@ -158,11 +158,11 @@ export function ParticipantDetails({
     const position = parseInt(code.charAt(0), 10);
     const groupLetter = code.charAt(1);
     const groupName = `Group ${groupLetter}`;
-    
+
     if (isGroupFinished(groupName)) {
       const standings = groupStandings[groupName] || [];
       const teamObj = standings[position - 1];
-      
+
       if (teamObj && teamObj.team) {
         return teamObj.team;
       }
@@ -228,7 +228,7 @@ export function ParticipantDetails({
 
   const resolveTeamName = (matchId: string, slot: 'team1' | 'team2', matchesList: Match[]): string => {
     const match = matchesList.find(m => m.id === matchId);
-    
+
     const mNum = parseInt(matchId.substring(1), 10);
     if (mNum >= 73 && mNum <= 88) {
       if (match && match.team1 && match.team1.length === 3 && match.team2 && match.team2.length === 3) {
@@ -238,17 +238,17 @@ export function ParticipantDetails({
     }
 
     const parents: Record<string, { t1: string, t2: string }> = {
-      'M89': { t1: 'M73', t2: 'M74' },
-      'M90': { t1: 'M75', t2: 'M76' },
-      'M91': { t1: 'M77', t2: 'M78' },
+      'M89': { t1: 'M74', t2: 'M77' },
+      'M90': { t1: 'M73', t2: 'M75' },
+      'M91': { t1: 'M76', t2: 'M78' },
       'M92': { t1: 'M79', t2: 'M80' },
-      'M93': { t1: 'M81', t2: 'M82' },
-      'M94': { t1: 'M83', t2: 'M84' },
-      'M95': { t1: 'M85', t2: 'M86' },
-      'M96': { t1: 'M87', t2: 'M88' },
+      'M93': { t1: 'M83', t2: 'M84' },
+      'M94': { t1: 'M81', t2: 'M82' },
+      'M95': { t1: 'M86', t2: 'M88' },
+      'M96': { t1: 'M85', t2: 'M87' },
       'M97': { t1: 'M89', t2: 'M90' },
-      'M98': { t1: 'M91', t2: 'M92' },
-      'M99': { t1: 'M93', t2: 'M94' },
+      'M98': { t1: 'M93', t2: 'M94' },
+      'M99': { t1: 'M91', t2: 'M92' },
       'M100': { t1: 'M95', t2: 'M96' },
       'M101': { t1: 'M97', t2: 'M98' },
       'M102': { t1: 'M99', t2: 'M100' },
@@ -328,14 +328,14 @@ export function ParticipantDetails({
   const handleScoreChange = (matchId: string, teamIndex: 1 | 2, val: string) => {
     const currentScore = editedPreds.matches[matchId] || '';
     const [s1, s2] = parseScore(currentScore);
-    
+
     const newScore1 = teamIndex === 1 ? val : s1;
     const newScore2 = teamIndex === 2 ? val : s2;
-    
+
     let finalScore = '';
     if (newScore1 !== '' || newScore2 !== '') {
       finalScore = `${newScore1}-${newScore2}`;
-      
+
       // Auto-add qualifier for draws in knockout rounds if not already set
       const isKnockout = matchId.startsWith('M') && parseInt(matchId.substring(1), 10) >= 73;
       if (isKnockout && newScore1 === newScore2 && newScore1 !== '') {
@@ -346,7 +346,7 @@ export function ParticipantDetails({
         }
       }
     }
-    
+
     setEditedPredictions(prev => ({
       ...prev,
       matches: {
@@ -360,7 +360,7 @@ export function ParticipantDetails({
     const currentScore = editedPreds.matches[matchId] || '';
     const [s1, s2] = parseScore(currentScore);
     if (s1 === '' || s2 === '') return;
-    
+
     const finalScore = `${s1}-${s2} (${qualifier})`;
     setEditedPredictions(prev => ({
       ...prev,
@@ -374,11 +374,11 @@ export function ParticipantDetails({
   const handleEditClick = () => {
     if (participant.password) {
       // Participant already has a password set. Ask for it!
-      const promptText = lang === 'es' 
+      const promptText = lang === 'es'
         ? `🔑 Introduce tu contraseña para editar las predicciones de ${participant.name}:`
         : `🔑 Enter your password to edit the predictions for ${participant.name}:`;
       const pwd = window.prompt(promptText);
-      
+
       if (pwd === participant.password) {
         setIsEditing(true);
       } else if (pwd !== null) {
@@ -390,7 +390,7 @@ export function ParticipantDetails({
         ? `🔒 Esta es la primera vez que editas tus predicciones.\nElige una contraseña para protegerlas en el futuro:`
         : `🔒 This is the first time you edit your predictions.\nPlease choose a password to protect them in the future:`;
       const newPwd = window.prompt(setupText);
-      
+
       if (newPwd && newPwd.trim().length > 0) {
         setCreatedPassword(newPwd.trim());
         setIsEditing(true);
@@ -507,8 +507,8 @@ export function ParticipantDetails({
         </h3>
         <div>
           {isEditing ? (
-            <button 
-              onClick={handleSave} 
+            <button
+              onClick={handleSave}
               disabled={saving}
               style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem 0.4rem', color: 'var(--accent-green)', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}
               title={lang === 'es' ? 'Guardar todos los cambios' : 'Save all changes'}
@@ -516,7 +516,7 @@ export function ParticipantDetails({
               💾 {saving ? t.pdSaving : t.pdSaveBtn}
             </button>
           ) : (
-            <button 
+            <button
               onClick={handleEditClick}
               style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem 0.4rem', color: 'var(--accent-blue)', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}
               title={lang === 'es' ? 'Editar pronósticos' : 'Edit predictions'}
@@ -527,20 +527,20 @@ export function ParticipantDetails({
         </div>
       </div>
       <div className="form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-        
+
         {/* Ganador Final */}
         <div className="form-group" style={{ margin: 0 }}>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-light)' }}>{t.pdFinalWinner}</label>
           {isEditing ? (
-            <input 
-              type="text" 
-              value={editedPreds.ganadorFinal} 
+            <input
+              type="text"
+              value={editedPreds.ganadorFinal}
               onChange={e => handleChangeGeneral('ganadorFinal', e.target.value)}
               disabled={isFieldDisabled('ganadorFinal')}
-              style={{ 
-                padding: '0.4rem', 
-                border: '1.5px solid var(--border)', 
-                borderRadius: '4px', 
+              style={{
+                padding: '0.4rem',
+                border: '1.5px solid var(--border)',
+                borderRadius: '4px',
                 fontSize: '0.9rem',
                 backgroundColor: 'var(--card-bg)',
                 color: 'var(--text)',
@@ -561,15 +561,15 @@ export function ParticipantDetails({
         <div className="form-group" style={{ margin: 0 }}>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-light)' }}>{t.pdMaxScorer}</label>
           {isEditing ? (
-            <input 
-              type="text" 
-              value={editedPreds.maxGoleador} 
+            <input
+              type="text"
+              value={editedPreds.maxGoleador}
               onChange={e => handleChangeGeneral('maxGoleador', e.target.value)}
               disabled={isFieldDisabled('maxGoleador')}
-              style={{ 
-                padding: '0.4rem', 
-                border: '1.5px solid var(--border)', 
-                borderRadius: '4px', 
+              style={{
+                padding: '0.4rem',
+                border: '1.5px solid var(--border)',
+                borderRadius: '4px',
                 fontSize: '0.9rem',
                 backgroundColor: 'var(--card-bg)',
                 color: 'var(--text)',
@@ -590,15 +590,15 @@ export function ParticipantDetails({
         <div className="form-group" style={{ margin: 0 }}>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-light)' }}>{t.pdMaxAssist}</label>
           {isEditing ? (
-            <input 
-              type="text" 
-              value={editedPreds.maxAsistente} 
+            <input
+              type="text"
+              value={editedPreds.maxAsistente}
               onChange={e => handleChangeGeneral('maxAsistente', e.target.value)}
               disabled={isFieldDisabled('maxAsistente')}
-              style={{ 
-                padding: '0.4rem', 
-                border: '1.5px solid var(--border)', 
-                borderRadius: '4px', 
+              style={{
+                padding: '0.4rem',
+                border: '1.5px solid var(--border)',
+                borderRadius: '4px',
                 fontSize: '0.9rem',
                 backgroundColor: 'var(--card-bg)',
                 color: 'var(--text)',
@@ -619,15 +619,15 @@ export function ParticipantDetails({
         <div className="form-group" style={{ margin: 0 }}>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-light)' }}>{t.pdWorldCupMvp}</label>
           {isEditing ? (
-            <input 
-              type="text" 
-              value={editedPreds.mvp} 
+            <input
+              type="text"
+              value={editedPreds.mvp}
               onChange={e => handleChangeGeneral('mvp', e.target.value)}
               disabled={isFieldDisabled('mvp')}
-              style={{ 
-                padding: '0.4rem', 
-                border: '1.5px solid var(--border)', 
-                borderRadius: '4px', 
+              style={{
+                padding: '0.4rem',
+                border: '1.5px solid var(--border)',
+                borderRadius: '4px',
                 fontSize: '0.9rem',
                 backgroundColor: 'var(--card-bg)',
                 color: 'var(--text)',
@@ -648,15 +648,15 @@ export function ParticipantDetails({
         <div className="form-group" style={{ margin: 0 }}>
           <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-light)' }}>{t.pdSpainStage}</label>
           {isEditing ? (
-            <input 
-              type="text" 
-              value={editedPreds.faseEspana} 
+            <input
+              type="text"
+              value={editedPreds.faseEspana}
               onChange={e => handleChangeGeneral('faseEspana', e.target.value)}
               disabled={isFieldDisabled('faseEspana')}
-              style={{ 
-                padding: '0.4rem', 
-                border: '1.5px solid var(--border)', 
-                borderRadius: '4px', 
+              style={{
+                padding: '0.4rem',
+                border: '1.5px solid var(--border)',
+                borderRadius: '4px',
                 fontSize: '0.9rem',
                 backgroundColor: 'var(--card-bg)',
                 color: 'var(--text)',
@@ -687,13 +687,13 @@ export function ParticipantDetails({
       </div>
 
       {/* MATCH PREDICTIONS GRID */}
-      <h3 
+      <h3
         onClick={() => setIsGroupStageExpanded(!isGroupStageExpanded)}
-        style={{ 
-          fontSize: '1.05rem', 
-          fontWeight: 700, 
-          borderLeft: '4px solid var(--accent-green)', 
-          paddingLeft: '0.5rem', 
+        style={{
+          fontSize: '1.05rem',
+          fontWeight: 700,
+          borderLeft: '4px solid var(--accent-green)',
+          paddingLeft: '0.5rem',
           margin: '0.5rem 0',
           cursor: 'pointer',
           display: 'flex',
@@ -708,253 +708,253 @@ export function ParticipantDetails({
           {isGroupStageExpanded ? '▲' : '▼'}
         </span>
       </h3>
-      
+
       {isGroupStageExpanded && (
         <div className="details-groups-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
-        {sortedGroupNames.map(groupName => {
-          const colors = (theme === 'dark' ? GROUP_COLORS_DARK : GROUP_COLORS)[groupName] || { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' };
-          return (
-            <div 
-              key={groupName} 
-              className="details-group-card" 
-              style={{ border: `1.5px solid var(--border)`, borderRadius: '8px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}
-            >
-              <div 
-                style={{ 
-                  backgroundColor: colors.bg, 
-                  color: colors.text, 
-                  padding: '0.4rem 1rem', 
-                  margin: 0, 
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  borderBottom: `1px solid ${colors.border}`
-                }}
+          {sortedGroupNames.map(groupName => {
+            const colors = (theme === 'dark' ? GROUP_COLORS_DARK : GROUP_COLORS)[groupName] || { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' };
+            return (
+              <div
+                key={groupName}
+                className="details-group-card"
+                style={{ border: `1.5px solid var(--border)`, borderRadius: '8px', overflow: 'hidden', boxShadow: 'var(--shadow)' }}
               >
-                <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'inherit' }}>
-                  {groupName}
-                </h4>
-                <div>
-                  {isEditing ? (
-                    <button 
-                      onClick={handleSave} 
-                      disabled={saving}
-                      style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      title={lang === 'es' ? 'Guardar todos los cambios' : 'Save all changes'}
-                    >
-                      💾
-                    </button>
-                  ) : (
-                    <button 
-                      onClick={handleEditClick}
-                      style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-                      title={lang === 'es' ? 'Editar pronósticos' : 'Edit predictions'}
-                    >
-                      ✏️
-                    </button>
-                  )}
+                <div
+                  style={{
+                    backgroundColor: colors.bg,
+                    color: colors.text,
+                    padding: '0.4rem 1rem',
+                    margin: 0,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottom: `1px solid ${colors.border}`
+                  }}
+                >
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'inherit' }}>
+                    {groupName}
+                  </h4>
+                  <div>
+                    {isEditing ? (
+                      <button
+                        onClick={handleSave}
+                        disabled={saving}
+                        style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        title={lang === 'es' ? 'Guardar todos los cambios' : 'Save all changes'}
+                      >
+                        💾
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleEditClick}
+                        style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        title={lang === 'es' ? 'Editar pronósticos' : 'Edit predictions'}
+                      >
+                        ✏️
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="group-matches-editor-list" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                {groups[groupName].map(m => {
-                  const pred = isEditing ? editedPreds.matches[m.id] : participant.predictions.matches[m.id];
-                  const real = realResults.matches[m.id];
-                  const pts = participant.points.matches[m.id] || 0;
-                  const timeLocked = isMatchLocked(m, isAdmin);
-                  const isLocked = !isAdmin && (!!real || timeLocked);
-                  const locked6h = !isAdmin && !real && timeLocked;
-                  
-                  let ptsClass = 'pts-zero';
-                  if (pts === 3) ptsClass = 'pts-exact';
-                  if (pts === 1) ptsClass = 'pts-outcome';
+                <div className="group-matches-editor-list" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {groups[groupName].map(m => {
+                    const pred = isEditing ? editedPreds.matches[m.id] : participant.predictions.matches[m.id];
+                    const real = realResults.matches[m.id];
+                    const pts = participant.points.matches[m.id] || 0;
+                    const timeLocked = isMatchLocked(m, isAdmin);
+                    const isLocked = !isAdmin && (!!real || timeLocked);
+                    const locked6h = !isAdmin && !real && timeLocked;
 
-                  const isHighlighted = m.id === initialMatchId;
+                    let ptsClass = 'pts-zero';
+                    if (pts === 3) ptsClass = 'pts-exact';
+                    if (pts === 1) ptsClass = 'pts-outcome';
 
-                  return (
-                    <div 
-                      key={m.id} 
-                      ref={el => { matchRefs.current[m.id] = el; }}
-                      className={`detail-match-row ${ptsClass} ${isHighlighted ? 'match-row-highlight' : ''}`}
-                      style={{ 
-                        padding: '0.75rem', 
-                        borderRadius: '6px', 
-                        border: '1.5px solid var(--border)', 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '0.4rem',
-                        ...(isLocked ? { backgroundColor: 'var(--bg)', opacity: 0.85 } : {})
-                      }}
-                    >
-                      <div className="detail-match-header flex justify-between items-center" style={{ borderBottom: '1px dashed var(--border)', paddingBottom: '0.25rem', fontSize: '0.8rem' }}>
-                        <span className="team-flag-pair flex gap-1 items-center">
-                          <img src={getFlagImgUrl(m.team1)} alt={m.team1} className="flag-icon-img" style={{ width: '18px', height: '12px' }} />
-                          <span style={isLocked ? { color: 'var(--text-light)' } : {}}>{normalizeTeamCode(m.team1)}</span>
-                          <span className="vs-divider text-muted font-normal">vs</span>
-                          <img src={getFlagImgUrl(m.team2)} alt={m.team2} className="flag-icon-img" style={{ width: '18px', height: '12px' }} />
-                          <span style={isLocked ? { color: 'var(--text-light)' } : {}}>{normalizeTeamCode(m.team2)}</span>
-                        </span>
-                        {(m.date || m.time || m.kickoffAtUtc) && (
-                          <span className="detail-match-date" title={getOriginalMatchDateTime(m)}>
-                            📅 {formatMatchLocalDateTime(m, lang)}
+                    const isHighlighted = m.id === initialMatchId;
+
+                    return (
+                      <div
+                        key={m.id}
+                        ref={el => { matchRefs.current[m.id] = el; }}
+                        className={`detail-match-row ${ptsClass} ${isHighlighted ? 'match-row-highlight' : ''}`}
+                        style={{
+                          padding: '0.75rem',
+                          borderRadius: '6px',
+                          border: '1.5px solid var(--border)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.4rem',
+                          ...(isLocked ? { backgroundColor: 'var(--bg)', opacity: 0.85 } : {})
+                        }}
+                      >
+                        <div className="detail-match-header flex justify-between items-center" style={{ borderBottom: '1px dashed var(--border)', paddingBottom: '0.25rem', fontSize: '0.8rem' }}>
+                          <span className="team-flag-pair flex gap-1 items-center">
+                            <img src={getFlagImgUrl(m.team1)} alt={m.team1} className="flag-icon-img" style={{ width: '18px', height: '12px' }} />
+                            <span style={isLocked ? { color: 'var(--text-light)' } : {}}>{normalizeTeamCode(m.team1)}</span>
+                            <span className="vs-divider text-muted font-normal">vs</span>
+                            <img src={getFlagImgUrl(m.team2)} alt={m.team2} className="flag-icon-img" style={{ width: '18px', height: '12px' }} />
+                            <span style={isLocked ? { color: 'var(--text-light)' } : {}}>{normalizeTeamCode(m.team2)}</span>
                           </span>
-                        )}
-                        {locked6h && (
-                          <span className="detail-lock-badge">
-                            🔒 {lang === 'es' ? 'Bloqueado' : 'Locked'}
-                          </span>
-                        )}
-                        {real && real.trim() !== '' && real.trim() !== '-' && (
-                          <div style={{ display: 'flex', gap: '0.25rem' }}>
-                            {pts === 3 && <span className="badge-pts-exact">+3</span>}
-                            {pts === 1 && <span className="badge-pts-outcome">+1</span>}
-                            {pts === 0 && <span className="badge-pts-zero">0</span>}
-                          </div>
-                        )}
-                      </div>
+                          {(m.date || m.time || m.kickoffAtUtc) && (
+                            <span className="detail-match-date" title={getOriginalMatchDateTime(m)}>
+                              📅 {formatMatchLocalDateTime(m, lang)}
+                            </span>
+                          )}
+                          {locked6h && (
+                            <span className="detail-lock-badge">
+                              🔒 {lang === 'es' ? 'Bloqueado' : 'Locked'}
+                            </span>
+                          )}
+                          {real && real.trim() !== '' && real.trim() !== '-' && (
+                            <div style={{ display: 'flex', gap: '0.25rem' }}>
+                              {pts === 3 && <span className="badge-pts-exact">+3</span>}
+                              {pts === 1 && <span className="badge-pts-outcome">+1</span>}
+                              {pts === 0 && <span className="badge-pts-zero">0</span>}
+                            </div>
+                          )}
+                        </div>
 
-                      <div className="detail-match-scores flex justify-between items-center" style={{ fontSize: '0.9rem' }}>
-                        {isEditing ? (
-                          (() => {
-                            const [s1, s2] = parseScore(pred);
-                            const isKnockout = m.id.startsWith('M') && parseInt(m.id.substring(1), 10) >= 73;
-                            const isDraw = s1 !== '' && s2 !== '' && s1 === s2;
-                            const currentQualifier = pred && pred.toUpperCase().includes('(Q2)') ? 'Q2' : 'Q1';
+                        <div className="detail-match-scores flex justify-between items-center" style={{ fontSize: '0.9rem' }}>
+                          {isEditing ? (
+                            (() => {
+                              const [s1, s2] = parseScore(pred);
+                              const isKnockout = m.id.startsWith('M') && parseInt(m.id.substring(1), 10) >= 73;
+                              const isDraw = s1 !== '' && s2 !== '' && s1 === s2;
+                              const currentQualifier = pred && pred.toUpperCase().includes('(Q2)') ? 'Q2' : 'Q1';
 
-                            return (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
-                                <div className="match-score-selectors" style={{ width: '100px' }}>
-                                  <select 
-                                    value={s1} 
-                                    onChange={e => handleScoreChange(m.id, 1, e.target.value)}
-                                    className="score-select"
-                                    disabled={isLocked}
-                                    style={isLocked ? { backgroundColor: 'var(--bg)', color: 'var(--text-light)', cursor: 'not-allowed', border: '1px solid var(--border)', padding: '0.2rem 0.1rem', fontSize: '0.85rem' } : { padding: '0.2rem 0.1rem', fontSize: '0.85rem' }}
-                                  >
-                                    {SCORE_OPTIONS.map(opt => (
-                                      <option key={opt} value={opt}>{opt === '' ? '-' : opt}</option>
-                                    ))}
-                                  </select>
-                                  <span className="score-divider" style={{ fontSize: '0.9rem' }}>-</span>
-                                  <select 
-                                    value={s2} 
-                                    onChange={e => handleScoreChange(m.id, 2, e.target.value)}
-                                    className="score-select"
-                                    disabled={isLocked}
-                                    style={isLocked ? { backgroundColor: 'var(--bg)', color: 'var(--text-light)', cursor: 'not-allowed', border: '1px solid var(--border)', padding: '0.2rem 0.1rem', fontSize: '0.85rem' } : { padding: '0.2rem 0.1rem', fontSize: '0.85rem' }}
-                                  >
-                                    {SCORE_OPTIONS.map(opt => (
-                                      <option key={opt} value={opt}>{opt === '' ? '-' : opt}</option>
-                                    ))}
-                                  </select>
-                                </div>
-                                {isKnockout && isDraw && (
-                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginTop: '0.1rem', width: '100%' }}>
-                                    <span style={{ fontSize: '0.68rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
-                                      {lang === 'es' ? 'Pasa ronda:' : 'Qualifies:'}
-                                    </span>
-                                    <div style={{ display: 'flex', gap: '0.3rem' }}>
-                                      <button
-                                        type="button"
-                                        disabled={isLocked}
-                                        onClick={() => handleQualifierChange(m.id, 'Q1')}
-                                        style={{
-                                          padding: '0.15rem 0.35rem',
-                                          fontSize: '0.65rem',
-                                          borderRadius: '4px',
-                                          border: currentQualifier === 'Q1' ? '1.5px solid var(--accent-blue)' : '1px solid var(--border)',
-                                          backgroundColor: currentQualifier === 'Q1' ? 'rgba(59, 130, 246, 0.1)' : 'var(--card-bg)',
-                                          color: currentQualifier === 'Q1' ? 'var(--accent-blue)' : 'var(--text-light)',
-                                          fontWeight: currentQualifier === 'Q1' ? 'bold' : 'normal',
-                                          cursor: isLocked ? 'not-allowed' : 'pointer'
-                                        }}
-                                      >
-                                        {normalizeTeamCode(m.team1)}
-                                      </button>
-                                      <button
-                                        type="button"
-                                        disabled={isLocked}
-                                        onClick={() => handleQualifierChange(m.id, 'Q2')}
-                                        style={{
-                                          padding: '0.15rem 0.35rem',
-                                          fontSize: '0.65rem',
-                                          borderRadius: '4px',
-                                          border: currentQualifier === 'Q2' ? '1.5px solid var(--accent-blue)' : '1px solid var(--border)',
-                                          backgroundColor: currentQualifier === 'Q2' ? 'rgba(59, 130, 246, 0.1)' : 'var(--card-bg)',
-                                          color: currentQualifier === 'Q2' ? 'var(--accent-blue)' : 'var(--text-light)',
-                                          fontWeight: currentQualifier === 'Q2' ? 'bold' : 'normal',
-                                          cursor: isLocked ? 'not-allowed' : 'pointer'
-                                        }}
-                                      >
-                                        {normalizeTeamCode(m.team2)}
-                                      </button>
-                                    </div>
+                              return (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
+                                  <div className="match-score-selectors" style={{ width: '100px' }}>
+                                    <select
+                                      value={s1}
+                                      onChange={e => handleScoreChange(m.id, 1, e.target.value)}
+                                      className="score-select"
+                                      disabled={isLocked}
+                                      style={isLocked ? { backgroundColor: 'var(--bg)', color: 'var(--text-light)', cursor: 'not-allowed', border: '1px solid var(--border)', padding: '0.2rem 0.1rem', fontSize: '0.85rem' } : { padding: '0.2rem 0.1rem', fontSize: '0.85rem' }}
+                                    >
+                                      {SCORE_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt === '' ? '-' : opt}</option>
+                                      ))}
+                                    </select>
+                                    <span className="score-divider" style={{ fontSize: '0.9rem' }}>-</span>
+                                    <select
+                                      value={s2}
+                                      onChange={e => handleScoreChange(m.id, 2, e.target.value)}
+                                      className="score-select"
+                                      disabled={isLocked}
+                                      style={isLocked ? { backgroundColor: 'var(--bg)', color: 'var(--text-light)', cursor: 'not-allowed', border: '1px solid var(--border)', padding: '0.2rem 0.1rem', fontSize: '0.85rem' } : { padding: '0.2rem 0.1rem', fontSize: '0.85rem' }}
+                                    >
+                                      {SCORE_OPTIONS.map(opt => (
+                                        <option key={opt} value={opt}>{opt === '' ? '-' : opt}</option>
+                                      ))}
+                                    </select>
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })()
-                        ) : (
-                          (() => {
-                            const isKnockout = m.id.startsWith('M') && parseInt(m.id.substring(1), 10) >= 73;
-                            let predictedQualifierCode = '';
-                            if (isKnockout && pred && pred.trim() !== '' && pred.trim() !== '-') {
-                              const [ps1, ps2] = parseScore(pred);
-                              if (ps1 !== '' && ps2 !== '') {
-                                const pn1 = parseInt(ps1, 10);
-                                const pn2 = parseInt(ps2, 10);
-                                if (pn1 > pn2) predictedQualifierCode = m.team1;
-                                else if (pn2 > pn1) predictedQualifierCode = m.team2;
-                                else {
-                                  predictedQualifierCode = pred.toUpperCase().includes('(Q2)') ? m.team2 : m.team1;
+                                  {isKnockout && isDraw && (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', marginTop: '0.1rem', width: '100%' }}>
+                                      <span style={{ fontSize: '0.68rem', fontWeight: 'bold', color: 'var(--text-light)' }}>
+                                        {lang === 'es' ? 'Pasa ronda:' : 'Qualifies:'}
+                                      </span>
+                                      <div style={{ display: 'flex', gap: '0.3rem' }}>
+                                        <button
+                                          type="button"
+                                          disabled={isLocked}
+                                          onClick={() => handleQualifierChange(m.id, 'Q1')}
+                                          style={{
+                                            padding: '0.15rem 0.35rem',
+                                            fontSize: '0.65rem',
+                                            borderRadius: '4px',
+                                            border: currentQualifier === 'Q1' ? '1.5px solid var(--accent-blue)' : '1px solid var(--border)',
+                                            backgroundColor: currentQualifier === 'Q1' ? 'rgba(59, 130, 246, 0.1)' : 'var(--card-bg)',
+                                            color: currentQualifier === 'Q1' ? 'var(--accent-blue)' : 'var(--text-light)',
+                                            fontWeight: currentQualifier === 'Q1' ? 'bold' : 'normal',
+                                            cursor: isLocked ? 'not-allowed' : 'pointer'
+                                          }}
+                                        >
+                                          {normalizeTeamCode(m.team1)}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={isLocked}
+                                          onClick={() => handleQualifierChange(m.id, 'Q2')}
+                                          style={{
+                                            padding: '0.15rem 0.35rem',
+                                            fontSize: '0.65rem',
+                                            borderRadius: '4px',
+                                            border: currentQualifier === 'Q2' ? '1.5px solid var(--accent-blue)' : '1px solid var(--border)',
+                                            backgroundColor: currentQualifier === 'Q2' ? 'rgba(59, 130, 246, 0.1)' : 'var(--card-bg)',
+                                            color: currentQualifier === 'Q2' ? 'var(--accent-blue)' : 'var(--text-light)',
+                                            fontWeight: currentQualifier === 'Q2' ? 'bold' : 'normal',
+                                            cursor: isLocked ? 'not-allowed' : 'pointer'
+                                          }}
+                                        >
+                                          {normalizeTeamCode(m.team2)}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            (() => {
+                              const isKnockout = m.id.startsWith('M') && parseInt(m.id.substring(1), 10) >= 73;
+                              let predictedQualifierCode = '';
+                              if (isKnockout && pred && pred.trim() !== '' && pred.trim() !== '-') {
+                                const [ps1, ps2] = parseScore(pred);
+                                if (ps1 !== '' && ps2 !== '') {
+                                  const pn1 = parseInt(ps1, 10);
+                                  const pn2 = parseInt(ps2, 10);
+                                  if (pn1 > pn2) predictedQualifierCode = m.team1;
+                                  else if (pn2 > pn1) predictedQualifierCode = m.team2;
+                                  else {
+                                    predictedQualifierCode = pred.toUpperCase().includes('(Q2)') ? m.team2 : m.team1;
+                                  }
                                 }
                               }
-                            }
-                            return (
-                              <span className="match-pred" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
-                                <span>Pred: <strong>{pred ? pred.split('(')[0].trim() : '-'}</strong></span>
-                                {predictedQualifierCode && (
-                                  <span style={{ 
-                                    color: 'var(--accent-blue)', 
-                                    fontWeight: '800', 
-                                    fontSize: '0.68rem', 
-                                    backgroundColor: 'rgba(59, 130, 246, 0.08)', 
-                                    padding: '0.1rem 0.35rem', 
-                                    borderRadius: '4px',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '0.2rem'
-                                  }}>
-                                    ➔ {normalizeTeamCode(predictedQualifierCode)}
-                                  </span>
-                                )}
-                              </span>
-                            );
-                          })()
-                        )}
-                        <span className="match-real text-muted" style={isLocked ? { color: 'var(--text)', fontWeight: 600 } : {}}>
-                          {t.pdRealResult} <strong>{real || '-'}</strong>
-                        </span>
+                              return (
+                                <span className="match-pred" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
+                                  <span>Pred: <strong>{pred ? pred.split('(')[0].trim() : '-'}</strong></span>
+                                  {predictedQualifierCode && (
+                                    <span style={{
+                                      color: 'var(--accent-blue)',
+                                      fontWeight: '800',
+                                      fontSize: '0.68rem',
+                                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                                      padding: '0.1rem 0.35rem',
+                                      borderRadius: '4px',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '0.2rem'
+                                    }}>
+                                      ➔ {normalizeTeamCode(predictedQualifierCode)}
+                                    </span>
+                                  )}
+                                </span>
+                              );
+                            })()
+                          )}
+                          <span className="match-real text-muted" style={isLocked ? { color: 'var(--text)', fontWeight: 600 } : {}}>
+                            {t.pdRealResult} <strong>{real || '-'}</strong>
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
 
       {/* KOCKOUT MATCHES SECTION (DASHBOARD GRID AT THE BOTTOM) */}
       {knockoutMatchesList.length > 0 && (
         <>
-          <h3 
+          <h3
             onClick={() => setIsKnockoutExpanded(!isKnockoutExpanded)}
-            style={{ 
-              fontSize: '1.05rem', 
-              fontWeight: 700, 
-              borderLeft: '4px solid var(--accent-blue)', 
-              paddingLeft: '0.5rem', 
+            style={{
+              fontSize: '1.05rem',
+              fontWeight: 700,
+              borderLeft: '4px solid var(--accent-blue)',
+              paddingLeft: '0.5rem',
               margin: '2rem 0 0.5rem 0',
               cursor: 'pointer',
               display: 'flex',
@@ -969,19 +969,19 @@ export function ParticipantDetails({
               {isKnockoutExpanded ? '▲' : '▼'}
             </span>
           </h3>
-          
+
           {isKnockoutExpanded && (
             <div className="details-groups-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginTop: '1rem' }}>
-              <div 
-                className="details-group-card" 
+              <div
+                className="details-group-card"
                 style={{ border: `1.5px solid var(--border)`, borderRadius: '8px', overflow: 'hidden', boxShadow: 'var(--shadow)', gridColumn: '1 / -1' }}
               >
-                <div 
-                  style={{ 
-                    backgroundColor: 'var(--border)', 
-                    color: 'var(--text)', 
-                    padding: '0.4rem 1rem', 
-                    margin: 0, 
+                <div
+                  style={{
+                    backgroundColor: 'var(--border)',
+                    color: 'var(--text)',
+                    padding: '0.4rem 1rem',
+                    margin: 0,
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center'
@@ -992,8 +992,8 @@ export function ParticipantDetails({
                   </h4>
                   <div>
                     {isEditing ? (
-                      <button 
-                        onClick={handleSave} 
+                      <button
+                        onClick={handleSave}
                         disabled={saving}
                         style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                         title={lang === 'es' ? 'Guardar todos los cambios' : 'Save all changes'}
@@ -1001,7 +1001,7 @@ export function ParticipantDetails({
                         💾
                       </button>
                     ) : (
-                      <button 
+                      <button
                         onClick={handleEditClick}
                         style={{ background: 'none', border: 'none', boxShadow: 'none', padding: '0.2rem', fontSize: '1.05rem', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
                         title={lang === 'es' ? 'Editar pronósticos' : 'Edit predictions'}
@@ -1011,7 +1011,7 @@ export function ParticipantDetails({
                     )}
                   </div>
                 </div>
-                
+
                 <div className="group-matches-editor-list" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1.25rem' }}>
                   {knockoutMatchesList.map(m => {
                     const pred = isEditing ? editedPreds.matches[m.id] : participant.predictions.matches[m.id];
@@ -1020,7 +1020,7 @@ export function ParticipantDetails({
                     const timeLocked = isMatchLocked(m, isAdmin);
                     const isLocked = !isAdmin && (!!real || timeLocked);
                     const locked6h = !isAdmin && !real && timeLocked;
-                    
+
                     let ptsClass = 'pts-zero';
                     if (pts >= 3) ptsClass = 'pts-exact';
                     else if (pts > 0) ptsClass = 'pts-outcome';
@@ -1034,16 +1034,16 @@ export function ParticipantDetails({
                     const isT2Real = team2Resolved.length === 3;
 
                     return (
-                      <div 
-                        key={m.id} 
+                      <div
+                        key={m.id}
                         ref={el => { matchRefs.current[m.id] = el; }}
                         className={`detail-match-row ${ptsClass} ${isHighlighted ? 'match-row-highlight' : ''}`}
-                        style={{ 
-                          padding: '0.75rem', 
-                          borderRadius: '6px', 
-                          border: '1.5px solid var(--border)', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
+                        style={{
+                          padding: '0.75rem',
+                          borderRadius: '6px',
+                          border: '1.5px solid var(--border)',
+                          display: 'flex',
+                          flexDirection: 'column',
                           gap: '0.4rem',
                           ...(isLocked ? { backgroundColor: 'var(--bg)', opacity: 0.85 } : {})
                         }}
@@ -1093,8 +1093,8 @@ export function ParticipantDetails({
                               return (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
                                   <div className="match-score-selectors" style={{ width: '100px' }}>
-                                    <select 
-                                      value={s1} 
+                                    <select
+                                      value={s1}
                                       onChange={e => handleScoreChange(m.id, 1, e.target.value)}
                                       className="score-select"
                                       disabled={isLocked}
@@ -1105,8 +1105,8 @@ export function ParticipantDetails({
                                       ))}
                                     </select>
                                     <span className="score-divider" style={{ fontSize: '0.9rem' }}>-</span>
-                                    <select 
-                                      value={s2} 
+                                    <select
+                                      value={s2}
                                       onChange={e => handleScoreChange(m.id, 2, e.target.value)}
                                       className="score-select"
                                       disabled={isLocked}
@@ -1182,12 +1182,12 @@ export function ParticipantDetails({
                                 <span className="match-pred" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.25rem' }}>
                                   <span>Pred: <strong>{pred ? pred.split('(')[0].trim() : '-'}</strong></span>
                                   {predictedQualifierCode && (
-                                    <span style={{ 
-                                      color: 'var(--accent-blue)', 
-                                      fontWeight: '800', 
-                                      fontSize: '0.68rem', 
-                                      backgroundColor: 'rgba(59, 130, 246, 0.08)', 
-                                      padding: '0.1rem 0.35rem', 
+                                    <span style={{
+                                      color: 'var(--accent-blue)',
+                                      fontWeight: '800',
+                                      fontSize: '0.68rem',
+                                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                                      padding: '0.1rem 0.35rem',
                                       borderRadius: '4px',
                                       display: 'inline-flex',
                                       alignItems: 'center',

@@ -14,14 +14,16 @@ interface Props {
 }
 
 function getOutcome(score: string): 'home' | 'away' | 'draw' | null {
-  if (!score || !score.includes('-')) return null;
-  const parts = score.split('-');
+  if (!score) return null;
+  const baseScore = score.split('(')[0].trim();
+  if (!baseScore.includes('-')) return null;
+  const parts = baseScore.split('-');
   if (parts.length !== 2) return null;
   const home = parseInt(parts[0].trim(), 10);
   const away = parseInt(parts[1].trim(), 10);
-  
+
   if (isNaN(home) || isNaN(away)) return null;
-  
+
   if (home > away) return 'home';
   if (away > home) return 'away';
   return 'draw';
@@ -56,23 +58,6 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
     return { total, homeWins, draws, awayWins, pctHome, pctDraw, pctAway };
   }, [match, participants]);
 
-  const calculatePoints = (pred: string): { pts: number; type: 'exact' | 'outcome' | 'none' } => {
-    if (!realScore || !pred) return { pts: 0, type: 'none' };
-    
-    if (pred.trim() === realScore.trim()) {
-      return { pts: POINTS.EXACT_MATCH, type: 'exact' };
-    }
-    
-    const predOutcome = getOutcome(pred);
-    const realOutcome = getOutcome(realScore);
-    
-    if (predOutcome && realOutcome && predOutcome === realOutcome) {
-      return { pts: POINTS.CORRECT_OUTCOME, type: 'outcome' };
-    }
-    
-    return { pts: 0, type: 'none' };
-  };
-
   const filteredParticipants = participants.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -81,7 +66,7 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content animate-fade-in" onClick={e => e.stopPropagation()} style={{ maxWidth: '650px' }}>
         <button className="modal-close-btn" onClick={onClose}>×</button>
-        
+
         {/* Modal Header */}
         <div style={{ textAlign: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border)', paddingBottom: '1.25rem' }}>
           <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.5rem' }}>
@@ -90,14 +75,14 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
           <p style={{ fontSize: '0.85rem', color: 'var(--text-light)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {match.group || 'Tournament Match'}
           </p>
-          
+
           {/* Match Versus Display */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', marginTop: '1rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, textAlign: 'right' }}>
               <img src={getFlagImgUrl(match.team1)} alt={match.team1} className="flag-icon-img" style={{ width: '40px', height: '28px', borderRadius: '4px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }} />
               <span style={{ fontSize: '1rem', fontWeight: 'bold', marginTop: '0.5rem' }}>{normalizeTeamCode(match.team1)}</span>
             </div>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-light)', background: 'var(--bg)', padding: '0.2rem 0.6rem', borderRadius: '12px' }}>VS</span>
               {realScore ? (
@@ -123,24 +108,24 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
               <p style={{ fontSize: '0.78rem', color: 'var(--text-light)', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.45rem', textAlign: 'center' }}>
                 📊 {lang === 'es' ? 'Tendencias de la Porra' : 'Match Betting Trends'} ({stats.total} {lang === 'es' ? 'votos' : 'predictions'})
               </p>
-              
+
               {/* Segmented Progress Bar */}
               <div style={{ display: 'flex', height: '10px', width: '100%', borderRadius: '5px', overflow: 'hidden', backgroundColor: 'var(--border)', margin: '0.5rem 0' }}>
                 {stats.pctHome > 0 && (
-                  <div 
-                    style={{ width: `${stats.pctHome}%`, backgroundColor: '#3b82f6', transition: 'width 0.3s ease' }} 
+                  <div
+                    style={{ width: `${stats.pctHome}%`, backgroundColor: '#3b82f6', transition: 'width 0.3s ease' }}
                     title={`${lang === 'es' ? 'Victoria de' : 'Win'} ${normalizeTeamCode(match.team1)}: ${stats.pctHome}%`}
                   />
                 )}
                 {stats.pctDraw > 0 && (
-                  <div 
-                    style={{ width: `${stats.pctDraw}%`, backgroundColor: '#94a3b8', transition: 'width 0.3s ease' }} 
+                  <div
+                    style={{ width: `${stats.pctDraw}%`, backgroundColor: '#94a3b8', transition: 'width 0.3s ease' }}
                     title={`${lang === 'es' ? 'Empate' : 'Draw'}: ${stats.pctDraw}%`}
                   />
                 )}
                 {stats.pctAway > 0 && (
-                  <div 
-                    style={{ width: `${stats.pctAway}%`, backgroundColor: '#ec4899', transition: 'width 0.3s ease' }} 
+                  <div
+                    style={{ width: `${stats.pctAway}%`, backgroundColor: '#ec4899', transition: 'width 0.3s ease' }}
                     title={`${lang === 'es' ? 'Victoria de' : 'Win'} ${normalizeTeamCode(match.team2)}: ${stats.pctAway}%`}
                   />
                 )}
@@ -188,28 +173,28 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
             <tbody>
               {filteredParticipants.map((p, idx) => {
                 const pred = p.predictions.matches[match.id] || '';
-                const { type } = calculatePoints(pred);
-                
+                const matchPts = p.points?.matches?.[match.id] ?? 0;
+
                 // Styling based on points
                 let predStyle: React.CSSProperties = { fontWeight: 'bold', fontSize: '1rem' };
                 let rowBg = 'transparent';
                 let ptsBadge = null;
 
                 if (realScore && pred) {
-                  if (type === 'exact') {
+                  if (matchPts >= 3) {
                     rowBg = '#f0fdf4'; // very soft green
                     predStyle = { ...predStyle, color: '#166534' };
                     ptsBadge = (
                       <span style={{ background: '#dcfce7', color: '#15803d', padding: '0.2rem 0.5rem', borderRadius: '12px', fontWeight: 'bold', fontSize: '0.8rem' }}>
-                        +{POINTS.EXACT_MATCH}
+                        +{matchPts}
                       </span>
                     );
-                  } else if (type === 'outcome') {
+                  } else if (matchPts > 0) {
                     rowBg = '#fefce8'; // very soft yellow
                     predStyle = { ...predStyle, color: '#854d0e' };
                     ptsBadge = (
                       <span style={{ background: '#fef9c3', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '12px', fontWeight: 'bold', fontSize: '0.8rem' }}>
-                        +{POINTS.CORRECT_OUTCOME}
+                        +{matchPts}
                       </span>
                     );
                   } else {
@@ -225,10 +210,10 @@ export function MatchPredictionsModal({ match, participants, realScore, lang, on
 
                 const isClickable = !!onNavigateToParticipant;
                 return (
-                  <tr 
-                    key={p.name} 
-                    style={{ 
-                      borderBottom: '1px solid var(--border)', 
+                  <tr
+                    key={p.name}
+                    style={{
+                      borderBottom: '1px solid var(--border)',
                       backgroundColor: rowBg,
                       cursor: isClickable ? 'pointer' : 'default',
                       transition: 'background-color 0.15s ease'

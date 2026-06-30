@@ -571,6 +571,7 @@ export async function syncOpenFootballData(): Promise<{ success: boolean; update
       team2: string;
       score?: {
         ft?: [number, number];
+        p?: [number, number];
       };
       goals1?: GoalObj[];
       goals2?: GoalObj[];
@@ -601,6 +602,9 @@ export async function syncOpenFootballData(): Promise<{ success: boolean; update
       let realResult: string | null = null;
       if (m.score && Array.isArray(m.score.ft)) {
         realResult = `${m.score.ft[0]}-${m.score.ft[1]}`;
+        if (m.score.p && Array.isArray(m.score.p)) {
+          realResult += ` (${m.score.p[0]}-${m.score.p[1]})`;
+        }
       }
 
       const team1Code = code1 || m.team1;

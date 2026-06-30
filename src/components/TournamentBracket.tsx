@@ -89,15 +89,15 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
   const groupStandings = useMemo(() => {
     const standings: Record<string, any[]> = {};
     const groupNames = [
-      'Group A', 'Group B', 'Group C', 'Group D', 
-      'Group E', 'Group F', 'Group G', 'Group H', 
+      'Group A', 'Group B', 'Group C', 'Group D',
+      'Group E', 'Group F', 'Group G', 'Group H',
       'Group I', 'Group J', 'Group K', 'Group L'
     ];
-    
+
     groupNames.forEach(gName => {
       standings[gName] = calculateGroupStandings(gName, matches, realResults);
     });
-    
+
     return standings;
   }, [matches, realResults]);
 
@@ -177,11 +177,11 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
     const position = parseInt(code.charAt(0), 10);
     const groupLetter = code.charAt(1);
     const groupName = `Group ${groupLetter}`;
-    
+
     if (isGroupFinished(groupName)) {
       const standings = groupStandings[groupName] || [];
       const teamObj = standings[position - 1];
-      
+
       if (teamObj && teamObj.team) {
         return teamObj.team;
       }
@@ -193,7 +193,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
   // Recursively resolve team name for a knockout slot
   function resolveTeamName(matchId: string, slot: 'team1' | 'team2', matchesList: Match[]): string {
     const match = matchesList.find(m => m.id === matchId);
-    
+
     const mNum = parseInt(matchId.substring(1), 10);
     if (mNum >= 73 && mNum <= 88) {
       if (match && match.team1 && match.team1.length === 3 && match.team2 && match.team2.length === 3) {
@@ -203,8 +203,8 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
     }
 
     const parents: Record<string, { t1: string, t2: string }> = {
-      'M89': { t1: 'M73', t2: 'M75' },
-      'M90': { t1: 'M74', t2: 'M77' },
+      'M89': { t1: 'M74', t2: 'M77' },
+      'M90': { t1: 'M73', t2: 'M75' },
       'M91': { t1: 'M76', t2: 'M78' },
       'M92': { t1: 'M79', t2: 'M80' },
       'M93': { t1: 'M83', t2: 'M84' },
@@ -212,8 +212,8 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
       'M95': { t1: 'M86', t2: 'M88' },
       'M96': { t1: 'M85', t2: 'M87' },
       'M97': { t1: 'M89', t2: 'M90' },
-      'M98': { t1: 'M91', t2: 'M92' },
-      'M99': { t1: 'M93', t2: 'M94' },
+      'M98': { t1: 'M93', t2: 'M94' },
+      'M99': { t1: 'M91', t2: 'M92' },
       'M100': { t1: 'M95', t2: 'M96' },
       'M101': { t1: 'M97', t2: 'M98' },
       'M102': { t1: 'M99', t2: 'M100' },
@@ -303,7 +303,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
   const r16Matches = r16Ids.map(id => getKnockoutMatch(id, 'Ganador M73', 'Ganador M74', '4 Jul 2026', '16:00 UTC-7', 'Seattle Stadium'));
   const qfMatches = qfIds.map(id => getKnockoutMatch(id, 'Ganador M89', 'Ganador M90', '9 Jul 2026', '17:00 UTC-4', 'Boston Stadium'));
   const sfMatches = sfIds.map(id => getKnockoutMatch(id, 'Ganador M97', 'Ganador M98', '14 Jul 2026', '19:00 UTC-5', 'Dallas Stadium'));
-  
+
   const thirdPlaceMatch = getKnockoutMatch('M103', 'Perdedor M101', 'Perdedor M102', '18 Jul 2026', '15:00 UTC-5', 'Miami Stadium');
   const finalMatch = getKnockoutMatch('M104', 'Ganador M101', 'Ganador M102', '19 Jul 2026', '16:00 UTC-4', 'New York NJ Stadium');
 
@@ -314,50 +314,50 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
   // Left:  M73+M75→M89, M74+M77→M90, M76+M78→M91, M79+M80→M92
   // Right: M83+M84→M93, M81+M82→M94, M86+M88→M95, M85+M87→M96
   const r32LeftMatches = [
-    r32Matches[0], // M73 ─┐
-    r32Matches[2], // M75 ─┘→ M89
-    r32Matches[1], // M74 ─┐
-    r32Matches[4], // M77 ─┘→ M90
-    r32Matches[3], // M76 ─┐
-    r32Matches[5], // M78 ─┘→ M91
-    r32Matches[6], // M79 ─┐
-    r32Matches[7]  // M80 ─┘→ M92
-  ];
-  
+    r32Matches.find(m => m.id === 'M74'),
+    r32Matches.find(m => m.id === 'M77'),
+    r32Matches.find(m => m.id === 'M73'),
+    r32Matches.find(m => m.id === 'M75'),
+    r32Matches.find(m => m.id === 'M83'),
+    r32Matches.find(m => m.id === 'M84'),
+    r32Matches.find(m => m.id === 'M81'),
+    r32Matches.find(m => m.id === 'M82')
+  ].filter(Boolean) as Match[];
+
   const r32RightMatches = [
-    r32Matches[10], // M83 ─┐
-    r32Matches[11], // M84 ─┘→ M93
-    r32Matches[8],  // M81 ─┐
-    r32Matches[9],  // M82 ─┘→ M94
-    r32Matches[13], // M86 ─┐
-    r32Matches[15], // M88 ─┘→ M95
-    r32Matches[12], // M85 ─┐
-    r32Matches[14]  // M87 ─┘→ M96
-  ];
+    r32Matches.find(m => m.id === 'M76'),
+    r32Matches.find(m => m.id === 'M78'),
+    r32Matches.find(m => m.id === 'M79'),
+    r32Matches.find(m => m.id === 'M80'),
+    r32Matches.find(m => m.id === 'M86'),
+    r32Matches.find(m => m.id === 'M88'),
+    r32Matches.find(m => m.id === 'M85'),
+    r32Matches.find(m => m.id === 'M87')
+  ].filter(Boolean) as Match[];
 
   const r16LeftMatches = [
-    r16Matches[0], // M89
-    r16Matches[1], // M90
-    r16Matches[2], // M91
-    r16Matches[3]  // M92
-  ];
+    r16Matches.find(m => m.id === 'M89'),
+    r16Matches.find(m => m.id === 'M90'),
+    r16Matches.find(m => m.id === 'M93'),
+    r16Matches.find(m => m.id === 'M94')
+  ].filter(Boolean) as Match[];
 
   const r16RightMatches = [
-    r16Matches[4], // M93
-    r16Matches[5], // M94
-    r16Matches[6], // M95
-    r16Matches[7]  // M96
-  ];
+    r16Matches.find(m => m.id === 'M91'),
+    r16Matches.find(m => m.id === 'M92'),
+    r16Matches.find(m => m.id === 'M95'),
+    r16Matches.find(m => m.id === 'M96')
+  ].filter(Boolean) as Match[];
 
   const qfLeftMatches = [
-    qfMatches[0], // M97
-    qfMatches[1]  // M98
-  ];
+    qfMatches.find(m => m.id === 'M97'),
+    qfMatches.find(m => m.id === 'M98')
+  ].filter(Boolean) as Match[];
 
   const qfRightMatches = [
-    qfMatches[2], // M99
-    qfMatches[3]  // M100
-  ];
+    qfMatches.find(m => m.id === 'M99'),
+    qfMatches.find(m => m.id === 'M100')
+  ].filter(Boolean) as Match[];
 
   const sfLeftMatch = sfMatches[0]; // M101
   const sfRightMatch = sfMatches[1]; // M102
@@ -370,8 +370,18 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
     // Parse scores if played
     let s1 = '';
     let s2 = '';
+    let p1 = '';
+    let p2 = '';
     if (realScore && realScore.trim() !== '' && realScore.trim() !== '-') {
-      const parts = realScore.split('-');
+      // Check for penalty shootouts: matches "(4-3)" or similar
+      const penaltyMatch = realScore.match(/\((\d+)\s*-\s*(\d+)[^)]*?\)/);
+      if (penaltyMatch) {
+        p1 = penaltyMatch[1];
+        p2 = penaltyMatch[2];
+      }
+
+      const baseScore = realScore.split('(')[0].trim();
+      const parts = baseScore.split('-');
       if (parts.length >= 2) {
         s1 = parts[0].trim();
         s2 = parts[1].trim();
@@ -388,8 +398,8 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
 
     if (bracketViewMode === 'detailed') {
       return (
-        <div 
-          key={m.id} 
+        <div
+          key={m.id}
           className="knockout-match-card animate-fade-in"
           onClick={() => setSelectedMatchForPredictions(m)}
           onMouseEnter={e => {
@@ -414,7 +424,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
             <span className="k-match-id">{m.id}</span>
             <span className="k-match-date">📅 {formatMatchDateToClient(m.date, m.time, lang)} - {formatMatchTimeToClient(m.date, m.time, lang)}</span>
           </div>
-          
+
           <div className="k-match-teams" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
             <div className="k-team" style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.35rem', minWidth: 0 }}>
               {isT1Real ? (
@@ -426,7 +436,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                 {normalizeTeamCode(m.team1)}
               </span>
             </div>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '35px', flexShrink: 0 }}>
               {realScore ? (
                 <span style={{ fontSize: '0.88rem', fontWeight: 800, color: '#059669', background: '#ecfdf5', padding: '0.05rem 0.35rem', borderRadius: '4px', border: '1px solid #a7f3d0' }}>
@@ -458,16 +468,16 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
 
     // GORGEOUS 2-ROW ESPN/CHALLONGE STYLE VERTICAL CARD (COMPACT VIEW)
     return (
-      <div 
-        key={m.id} 
+      <div
+        key={m.id}
         className="knockout-match-card animate-fade-in"
         onClick={() => setSelectedMatchForPredictions(m)}
         onMouseEnter={e => {
           e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = theme === 'dark' 
-            ? '0 6px 16px rgba(0, 0, 0, 0.4)' 
+          e.currentTarget.style.boxShadow = theme === 'dark'
+            ? '0 6px 16px rgba(0, 0, 0, 0.4)'
             : '0 6px 16px rgba(42, 44, 46, 0.15)';
-          
+
           const bgs = getHoverBackgroundStyles(m, isT1Real, isT2Real);
           e.currentTarget.style.backgroundImage = bgs.backgroundImage;
           e.currentTarget.style.backgroundPosition = bgs.backgroundPosition;
@@ -516,7 +526,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
             </span>
           </div>
           <span style={{ color: s1 !== '' ? '#059669' : 'var(--text-light)', minWidth: '15px', textAlign: 'right', fontWeight: '800' }}>
-            {s1 !== '' ? s1 : '-'}
+            {s1 !== '' ? (p1 ? `${s1} (${p1})` : s1) : '-'}
           </span>
         </div>
 
@@ -536,7 +546,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
             </span>
           </div>
           <span style={{ color: s2 !== '' ? '#059669' : 'var(--text-light)', minWidth: '15px', textAlign: 'right', fontWeight: '800' }}>
-            {s2 !== '' ? s2 : '-'}
+            {s2 !== '' ? (p2 ? `${s2} (${p2})` : s2) : '-'}
           </span>
         </div>
       </div>
@@ -551,7 +561,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
           {type === 'straight' && (
             <line x1="0" y1={H / 2} x2="40" y2={H / 2} stroke="var(--border)" strokeWidth="2" strokeDasharray="4 3" opacity="0.8" />
           )}
-          
+
           {type === 'left-fork' && Array.from({ length: count }).map((_, j) => {
             const y_top = (2 * j + 0.5) * (H / (count * 2));
             const y_bottom = (2 * j + 1.5) * (H / (count * 2));
@@ -597,15 +607,15 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
     const isT2Real = m.team2.length === 3;
 
     return (
-      <div 
-        key={m.id} 
+      <div
+        key={m.id}
         className="match-card animate-fade-in"
         onMouseEnter={e => {
           e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = theme === 'dark' 
-            ? '0 6px 16px rgba(0, 0, 0, 0.4)' 
+          e.currentTarget.style.boxShadow = theme === 'dark'
+            ? '0 6px 16px rgba(0, 0, 0, 0.4)'
             : '0 6px 16px rgba(42, 44, 46, 0.15)';
-          
+
           const bgs = getHoverBackgroundStyles(m, isT1Real, isT2Real);
           e.currentTarget.style.backgroundImage = bgs.backgroundImage;
           e.currentTarget.style.backgroundPosition = bgs.backgroundPosition;
@@ -635,7 +645,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
           {m.ground && <span>🏟️ {m.ground}</span>}
         </div>
 
-        <div 
+        <div
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0', cursor: 'pointer' }}
           onClick={() => setSelectedMatchForPredictions(m)}
           title={lang === 'es' ? 'Clic para ver pronósticos de participantes' : 'Click to view participant predictions'}
@@ -676,7 +686,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
           <span style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>
             📅 {formatMatchDateToClient(m.date, m.time, lang)}
           </span>
-          <button 
+          <button
             type="button"
             className="calendar-action-btn"
             onClick={() => setSelectedMatchForPredictions(m)}
@@ -699,12 +709,12 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
 
         {/* Center: Countdown card with progress bar */}
         <div className="bracket-header-center" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <div className="progress-card" style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
+          <div className="progress-card" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', 
+            background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
             border: '1px solid #bfdbfe',
             padding: '0.6rem 1.2rem',
             borderRadius: '12px',
@@ -713,7 +723,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
             minWidth: '180px',
             textAlign: 'center',
           }}
-          title={lang === 'es' ? `${playedMatchesCount} partidos jugados de ${totalMatchesCount} totales` : `${playedMatchesCount} matches played of ${totalMatchesCount} total`}
+            title={lang === 'es' ? `${playedMatchesCount} partidos jugados de ${totalMatchesCount} totales` : `${playedMatchesCount} matches played of ${totalMatchesCount} total`}
           >
             <span style={{ fontSize: '0.65rem', fontWeight: '800', color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '0.05em', lineHeight: 1 }}>
               {lang === 'es' ? 'Partidos Jugados' : 'Played Matches'}
@@ -727,17 +737,17 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
               </span>
             </div>
             {/* Animated progress bar track */}
-            <div style={{ 
-              width: '100%', 
-              backgroundColor: '#dbeafe', 
-              height: '6px', 
+            <div style={{
+              width: '100%',
+              backgroundColor: '#dbeafe',
+              height: '6px',
               borderRadius: '9999px',
               overflow: 'hidden'
             }}>
               {/* Animated progress bar fill */}
-              <div style={{ 
-                width: `${(playedMatchesCount / totalMatchesCount) * 100}%`, 
-                background: 'linear-gradient(90deg, #2A398D 0%, #E61D25 100%)', 
+              <div style={{
+                width: `${(playedMatchesCount / totalMatchesCount) * 100}%`,
+                background: 'linear-gradient(90deg, #2A398D 0%, #E61D25 100%)',
                 height: '100%',
                 borderRadius: '9999px',
                 transition: 'width 0.5s ease-out'
@@ -748,7 +758,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
 
         {/* Right: Sub-tabs */}
         <div className="sub-tabs">
-          <button 
+          <button
             className={`sub-tab-btn ${subTab === 'groups' ? 'active' : ''}`}
             onClick={() => {
               setSubTab('groups');
@@ -757,7 +767,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
           >
             {t.tbTabGroups}
           </button>
-          <button 
+          <button
             className={`sub-tab-btn ${subTab === 'knockout' ? 'active' : ''}`}
             onClick={() => setSubTab('knockout')}
           >
@@ -801,19 +811,19 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
               const colors = (theme === 'dark' ? GROUP_COLORS_DARK : GROUP_COLORS)[gName] || { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' };
 
               return (
-                <div 
-                  key={gName} 
+                <div
+                  key={gName}
                   className={`group-standings-card ${selectedGroupFilter === 'All' ? 'clickable-card' : ''}`}
                   onClick={selectedGroupFilter === 'All' ? () => setSelectedGroupFilter(gName) : undefined}
-                  style={{ 
-                    borderTop: `4px solid ${colors.border}`, 
-                    width: selectedGroupFilter !== 'All' ? '100%' : undefined, 
+                  style={{
+                    borderTop: `4px solid ${colors.border}`,
+                    width: selectedGroupFilter !== 'All' ? '100%' : undefined,
                     maxWidth: selectedGroupFilter !== 'All' ? '500px' : undefined,
                     cursor: selectedGroupFilter === 'All' ? 'pointer' : 'default'
                   }}
                   title={selectedGroupFilter === 'All' ? (lang === 'es' ? `Ver partidos y detalles de ${gName}` : `View matches and details of ${gName}`) : undefined}
                 >
-                  <h3 
+                  <h3
                     className="group-standings-title"
                     style={{ backgroundColor: colors.bg, color: colors.text }}
                   >
@@ -834,8 +844,8 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                         const isQualified = idx < 2; // top 2 qualify directly
                         const normalizedTeamCode = normalizeTeamCode(stat.team);
                         return (
-                          <tr 
-                            key={stat.team} 
+                          <tr
+                            key={stat.team}
                             className={isQualified ? 'qualified-row' : ''}
                           >
                             <td className="pos">{idx + 1}</td>
@@ -871,20 +881,20 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                     const realScore = realResults.matches[m.id];
                     const colors = (theme === 'dark' ? GROUP_COLORS_DARK : GROUP_COLORS)[selectedGroupFilter] || { bg: '#f3f4f6', text: '#374151', border: '#d1d5db' };
                     return (
-                      <div 
-                        key={m.id} 
+                      <div
+                        key={m.id}
                         className="match-card animate-fade-in"
-                        style={{ 
-                          borderTop: `4px solid ${colors.border}`, 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'space-between', 
-                          gap: '0.75rem', 
-                          padding: '1rem', 
-                          background: 'var(--card-bg)', 
-                          borderRadius: '8px', 
-                          boxShadow: 'var(--shadow)', 
-                          border: '1.5px solid var(--border)' 
+                        style={{
+                          borderTop: `4px solid ${colors.border}`,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          gap: '0.75rem',
+                          padding: '1rem',
+                          background: 'var(--card-bg)',
+                          borderRadius: '8px',
+                          boxShadow: 'var(--shadow)',
+                          border: '1.5px solid var(--border)'
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-light)', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.35rem' }}>
@@ -892,7 +902,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                           {m.date && <span>📅 {formatMatchDateToClient(m.date, m.time, lang)} @ {formatMatchTimeToClient(m.date, m.time, lang)}</span>}
                         </div>
 
-                        <div 
+                        <div
                           className="match-teams-display"
                           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', padding: '0.5rem 0' }}
                           onClick={() => setSelectedMatchForPredictions(m)}
@@ -902,7 +912,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                             <img src={getFlagImgUrl(m.team1)} alt={m.team1} className="flag-icon-img" style={{ width: '30px', height: '20px', borderRadius: '2px' }} />
                             <span className="team-name" style={{ fontSize: '0.8rem', fontWeight: 'bold', marginTop: '0.25rem' }}>{normalizeTeamCode(m.team1)}</span>
                           </span>
-                          
+
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.15rem', minWidth: '50px' }}>
                             <span style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--text-light)', background: '#f3f4f6', padding: '0.05rem 0.35rem', borderRadius: '8px' }}>vs</span>
                             {realScore ? (
@@ -934,7 +944,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
             <div className="knockout-alert-info" style={{ margin: 0 }}>
               💡 <strong>{t.tbFormatLabel}</strong> {t.tbFormatDesc}
             </div>
-            
+
             {/* Detailed / Compact switcher pill button */}
             <div style={{ display: 'flex', backgroundColor: 'var(--border)', padding: '2px', borderRadius: '8px', border: '1px solid var(--border)' }}>
               <button
@@ -1020,7 +1030,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
                     </div>
                   </div>
                 )}
-                
+
                 {(selectedRoundFilter === 'all' || selectedRoundFilter === 'r16') && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <h4 style={{ margin: '0.5rem 0 0 0', fontSize: '0.95rem', fontWeight: 'bold', borderLeft: '4px solid var(--accent-blue)', paddingLeft: '0.5rem', color: 'var(--text-light)' }}>
@@ -1070,7 +1080,7 @@ export function TournamentBracket({ matches, realResults, participants, lang, th
           ) : (
             <div className="compact-bracket-canvas-view animate-fade-in" style={{ width: '100%', overflowX: 'auto', padding: '1rem 0' }}>
               <div className="bracket-canvas" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: `${bracketH}px`, minWidth: '1980px', gap: 0, margin: '0 auto', padding: 0 }}>
-                
+
                 {/* 1. Left Wing: Round of 32 */}
                 <div className="bracket-round-column" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: `${bracketH}px`, width: '180px', flexShrink: 0 }}>
                   {r32LeftMatches.map(m => renderBracketMatchCard(m))}

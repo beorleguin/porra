@@ -19,12 +19,12 @@ const normalizeParticipantSearch = (value: string) =>
     .replace(/[\u0300-\u036f]/g, '')
     .trim();
 
-export function Leaderboard({ 
-  participants, 
-  realResults, 
-  matches, 
-  selectedParticipantName, 
-  onSelectParticipant, 
+export function Leaderboard({
+  participants,
+  realResults,
+  matches,
+  selectedParticipantName,
+  onSelectParticipant,
   lang,
   boteData
 }: Props) {
@@ -43,13 +43,13 @@ export function Leaderboard({
 
   // Get all played matches (matches with a real result) in chronological order
   const playedMatchesList = matches.filter(m => m.realResult && m.realResult.trim() !== '' && m.realResult.trim() !== '-');
-  
+
   // Take the last 5 played matches
   const last5PlayedMatches = playedMatchesList.slice(-5);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
+
       {/* Dynamic Bote Panel directly above classification */}
       {boteData && (
         <div className="bote-panel animate-fade-in">
@@ -176,9 +176,9 @@ export function Leaderboard({
 
                     if (!predictedScore || predictedScore.trim() === '' || predictedScore.trim() === '-') {
                       errors++;
-                    } else if (pointsEarned === 3) {
+                    } else if (pointsEarned === 3 || pointsEarned === 4) {
                       exactHits++;
-                    } else if (pointsEarned === 1) {
+                    } else if (pointsEarned === 1 || pointsEarned === 2) {
                       partialHits++;
                     } else {
                       errors++;
@@ -194,10 +194,10 @@ export function Leaderboard({
 
                   if (!predictedScore || predictedScore.trim() === '' || predictedScore.trim() === '-') {
                     formDots.push(<span key={m.id} className="form-dot loss" title="Fallo (0 pts)">F</span>);
-                  } else if (pointsEarned === 3) {
-                    formDots.push(<span key={m.id} className="form-dot win" title="Pleno (3 pts)">P</span>);
-                  } else if (pointsEarned === 1) {
-                    formDots.push(<span key={m.id} className="form-dot draw" title="Acierto (1 pt)">A</span>);
+                  } else if (pointsEarned === 3 || pointsEarned === 4) {
+                    formDots.push(<span key={m.id} className="form-dot win" title={'Pleno (${pointsEarned} pts)'}>P</span>);
+                  } else if (pointsEarned === 1 || pointsEarned === 2) {
+                    formDots.push(<span key={m.id} className="form-dot draw" title={'Acierto (${pointsEarned} pts)'}> A</span>);
                   } else {
                     formDots.push(<span key={m.id} className="form-dot loss" title="Fallo (0 pts)">F</span>);
                   }
@@ -209,8 +209,8 @@ export function Leaderboard({
                 }
 
                 return (
-                  <tr 
-                    key={p.name} 
+                  <tr
+                    key={p.name}
                     onClick={() => onSelectParticipant(p)}
                     className={`leaderboard-row ${isSelected ? 'selected-row' : ''} ${positionClass}`}
                   >
@@ -242,6 +242,6 @@ export function Leaderboard({
           </table>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
