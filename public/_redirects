@@ -1,0 +1,7 @@
+/api/data /.netlify/functions/data 200
+/api/sync-openfootball /.netlify/functions/sync-openfootball 200
+/api/save-predictions /.netlify/functions/save-predictions 200
+/api/save-csv /.netlify/functions/save-csv 200
+/api/restore-backup /.netlify/functions/restore-backup 200
+/api/stats/players /.netlify/functions/stats-players 200
+/* /index.html 200
