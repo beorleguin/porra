@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { Match, Participant } from '../domain/types';
 import { getFlagImgUrl, normalizeTeamCode } from '../utils/flags';
 import { TRANSLATIONS, Lang } from '../utils/translations';
-import { POINTS } from '../domain/scoring';
 
 interface Props {
   match: Match;
