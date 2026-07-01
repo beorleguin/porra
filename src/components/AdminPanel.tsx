@@ -19,8 +19,11 @@ interface Props {
 const SCORE_OPTIONS = ['', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
 
 const parseScore = (scoreStr: string | undefined): [string, string] => {
-  if (!scoreStr || !scoreStr.includes('-')) return ['', ''];
-  const parts = scoreStr.split('-');
+  if (!scoreStr) return ['', ''];
+  // Strip any penalty shootout scores in parentheses first!
+  const baseScore = scoreStr.split('(')[0].trim();
+  if (!baseScore.includes('-')) return ['', ''];
+  const parts = baseScore.split('-');
   return [parts[0].trim(), parts[1].trim()];
 };
 
@@ -74,6 +77,15 @@ export function AdminPanel({ matches, realResults, participants, onUpdate, onExp
       const response = await fetch('/api/sync-openfootball', {
         method: 'POST',
       });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(lang === 'es'
+          ? 'El servidor local no está ejecutando la API. Inicia la aplicación con "npx netlify dev" o "npx vercel dev" para habilitar las funciones del panel de administrador.'
+          : 'Local server API is not running. Start the application with "npx netlify dev" or "npx vercel dev" to enable administrator panel features.'
+        );
+      }
+
       const data = await response.json();
       if (data.success) {
         alert(t.apSyncSuccess.replace('{count}', String(data.count)));
@@ -123,7 +135,10 @@ export function AdminPanel({ matches, realResults, participants, onUpdate, onExp
         if (score) {
           const [s1, s2] = parseScore(score);
           if (s1 !== '' && s2 !== '') {
-            cleanedMatches[matchId] = `${s1}-${s2}`;
+            // Keep the penalty part if present (e.g., "1-1 (4-3)" -> " (4-3)")
+            const penaltyMatch = score.match(/\((\d+)\s*-\s*(\d+)[^)]*?\)/);
+            const penaltyPart = penaltyMatch ? ` ${penaltyMatch[0]}` : '';
+            cleanedMatches[matchId] = `${s1}-${s2}${penaltyPart}`;
           } else {
             cleanedMatches[matchId] = '';
           }

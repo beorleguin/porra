@@ -92,6 +92,46 @@ function App() {
   })).sort((a, b) => b.points.total - a.points.total);
 
   const handleUpdateRealResults = async (newResults: AppState['realResults']) => {
+    const isLocalDevMode = localStorage.getItem('porra_dev_mode') === 'true';
+
+    if (isLocalDevMode) {
+      const updatedState = { ...appState, realResults: newResults };
+      localStorage.setItem('porra_local_state', JSON.stringify(updatedState));
+      setAppState(updatedState);
+      alert(lang === 'es'
+        ? '💾 Resultados reales guardados localmente con éxito (Modo Local Standalone)'
+        : '💾 Real results saved locally successfully (Standalone Local Mode)'
+      );
+      
+      // Trigger confetti if M104 (Final) result was just set!
+      const hadFinalResult = appState.realResults.matches['M104'];
+      const hasFinalResult = newResults.matches['M104'];
+      if (!hadFinalResult && hasFinalResult && hasFinalResult.trim() !== '' && hasFinalResult.trim() !== '-') {
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 }
+          });
+        }, 250);
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 }
+          });
+        }, 400);
+      }
+      return;
+    }
+
     // Save physically to Supabase through Netlify Function
     try {
       const response = await fetch('/api/save-csv', {
@@ -104,6 +144,14 @@ function App() {
           adminPassword: adminPassword || undefined,
         }),
       });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(lang === 'es'
+          ? 'El servidor local no está ejecutando la API. Inicia la aplicación con "npx netlify dev" o "npx vercel dev" para habilitar las funciones del panel de administrador.'
+          : 'Local server API is not running. Start the application with "npx netlify dev" or "npx vercel dev" to enable administrator panel features.'
+        );
+      }
 
       const resData = await response.json();
 
@@ -150,6 +198,31 @@ function App() {
 
   const handleSavePredictions = async (name: string, updatedPredictions: Predictions, password?: string) => {
     if (!appState) return;
+
+    const isLocalDevMode = localStorage.getItem('porra_dev_mode') === 'true';
+
+    if (isLocalDevMode) {
+      const updatedParticipants = appState.participants.map(p => {
+        if (p.name.trim().toLowerCase() === name.trim().toLowerCase()) {
+          return {
+            ...p,
+            predictions: updatedPredictions,
+            password: password || p.password
+          };
+        }
+        return p;
+      });
+
+      const updatedState = {
+        ...appState,
+        participants: updatedParticipants
+      };
+
+      localStorage.setItem('porra_local_state', JSON.stringify(updatedState));
+      setAppState(updatedState);
+      alert(t.alertSavePredsSuccess.replace('{name}', name) + (lang === 'es' ? ' (Guardado localmente)' : ' (Saved locally)'));
+      return;
+    }
 
     try {
       const response = await fetch('/api/save-predictions', {
@@ -213,6 +286,22 @@ function App() {
 
   const handleRestoreBackup = async (backupData: AppState) => {
     setIsRestoring(true);
+    const isLocalDevMode = localStorage.getItem('porra_dev_mode') === 'true';
+
+    if (isLocalDevMode) {
+      localStorage.setItem('porra_local_state', JSON.stringify(backupData));
+      setAppState(backupData);
+      setSelectedParticipantName(null);
+      
+      alert(
+        lang === 'es'
+          ? '🔄 ¡Copia de seguridad restaurada localmente con éxito! La página se actualizará ahora.'
+          : '🔄 Backup restored locally successfully! The page will now refresh.'
+      );
+      window.location.reload();
+      return;
+    }
+
     try {
       const response = await fetch('/api/restore-backup', {
         method: 'POST',
@@ -475,7 +564,7 @@ function App() {
               </li>
               <li>
                 <span>Cierre de Apuestas</span>
-                <span style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--text-light)' }}>6h antes del inicio</span>
+                <span style={{ fontSize: '0.75rem', fontStyle: 'italic', color: 'var(--text-light)' }}>20 min antes del inicio</span>
               </li>
             </ul>
 
