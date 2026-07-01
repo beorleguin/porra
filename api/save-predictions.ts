@@ -14,10 +14,20 @@ export default async function handler(req: any, res: any) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
-    const { name, predictions, password } = body
 
-    if (!name || !predictions || !password) {
-      return res.status(400).json({ success: false, error: 'Missing name, predictions or password' })
+    const name = body.name
+    const predictions = body.predictions
+    const password = body.password
+    const adminPassword = body.adminPassword
+    const expectedAdminPassword = process.env.ADMIN_PASSWORD || 'root'
+    const isAdmin = !!adminPassword && adminPassword === expectedAdminPassword
+
+    if (!name || !predictions) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing name or predictions',
+        receivedKeys: Object.keys(body || {})
+      })
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
@@ -33,14 +43,27 @@ export default async function handler(req: any, res: any) {
     }
 
     const state = row.data
-    const participant = state.participants?.find((p: any) => p.name === name)
+    const participant = state.participants?.find(
+      (p: any) => p.name?.trim().toLowerCase() === name.trim().toLowerCase()
+    )
 
     if (!participant) {
       return res.status(404).json({ success: false, error: 'Participant not found' })
     }
 
-    if (participant.password !== password) {
-      return res.status(401).json({ success: false, error: 'Invalid password' })
+    if (!isAdmin) {
+      if (participant.password) {
+        if (!password || participant.password !== password) {
+          return res.status(401).json({ success: false, error: 'Invalid password' })
+        }
+      } else if (password) {
+        participant.password = password
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: 'Password required for first edit'
+        })
+      }
     }
 
     participant.predictions = predictions
@@ -51,6 +74,8 @@ export default async function handler(req: any, res: any) {
         id: 'main',
         data: state,
         updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'id'
       })
 
     if (updateError) {

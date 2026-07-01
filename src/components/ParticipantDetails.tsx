@@ -86,6 +86,7 @@ export function ParticipantDetails({
   const [editedPreds, setEditedPredictions] = useState<Predictions>({ ...participant.predictions });
   const [saving, setSaving] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
+  const [verifiedPassword, setVerifiedPassword] = useState<string>('');
   const [matchSearchTerm, setMatchSearchTerm] = useState('');
   const [isGroupStageExpanded, setIsGroupStageExpanded] = useState(true);
   const [isKnockoutExpanded, setIsKnockoutExpanded] = useState(true);
@@ -273,6 +274,7 @@ export function ParticipantDetails({
     setEditedPredictions({ ...participant.predictions });
     setIsEditing(false);
     setCreatedPassword(null);
+    setVerifiedPassword('');
   }, [participant]);
 
   // Auto-scroll and highlight selected match
@@ -380,6 +382,7 @@ export function ParticipantDetails({
       const pwd = window.prompt(promptText);
 
       if (pwd === participant.password) {
+        setVerifiedPassword(pwd);
         setIsEditing(true);
       } else if (pwd !== null) {
         alert(lang === 'es' ? '❌ Contraseña incorrecta.' : '❌ Incorrect password.');
@@ -393,6 +396,7 @@ export function ParticipantDetails({
 
       if (newPwd && newPwd.trim().length > 0) {
         setCreatedPassword(newPwd.trim());
+        setVerifiedPassword(newPwd.trim());
         setIsEditing(true);
       } else if (newPwd !== null) {
         alert(lang === 'es' ? '❌ Debes elegir una contraseña válida para poder editar.' : '❌ You must choose a valid password to start editing.');
@@ -430,9 +434,14 @@ export function ParticipantDetails({
         matches: cleanedMatches
       };
 
-      await onSavePredictions(participant.name, cleanedPreds, createdPassword || undefined);
+      await onSavePredictions(
+        participant.name,
+        cleanedPreds,
+        createdPassword || verifiedPassword || undefined
+      );
       setIsEditing(false);
       setCreatedPassword(null);
+      setVerifiedPassword('');
     } finally {
       setSaving(false);
     }
