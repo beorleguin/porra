@@ -84,7 +84,7 @@ export const handler = async (event: any) => {
       if (lockedChanges.length > 0) {
         return jsonResponse(403, {
           success: false,
-          error: `No se pueden modificar predicciones bloqueadas. Ya faltan menos de 6 horas o el partido ya tiene resultado real. Primer partido bloqueado: ${lockedChanges[0].matchId}`,
+          error: `No se pueden modificar predicciones bloqueadas. Ya faltan menos de 20 minutos o el partido ya tiene resultado real. Primer partido bloqueado: ${lockedChanges[0].matchId}`,
           lockedChanges,
         });
       }

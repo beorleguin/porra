@@ -151,8 +151,14 @@ export function calculatePointsForParticipant(
         } else {
           // If no explicit qualifier marker, deduce winner from predicted score outcome
           const predOutcome = getOutcome(cleanPred);
-          if (predOutcome === 'home') predictedQualifier = 'team1';
-          else if (predOutcome === 'away') predictedQualifier = 'team2';
+          if (predOutcome === 'home') {
+            predictedQualifier = 'team1';
+          } else if (predOutcome === 'away') {
+            predictedQualifier = 'team2';
+          } else if (predOutcome === 'draw') {
+            // If predicted score is a draw and has no explicit qualifier, default to team1 (matching UI default)
+            predictedQualifier = 'team1';
+          }
         }
 
         // Resolve real qualifier

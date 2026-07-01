@@ -61,7 +61,7 @@ const GROUP_COLORS_DARK: Record<string, { bg: string, text: string, border: stri
   'Group L': { bg: '#0f2f22', text: '#a7f3d0', border: '#065f46' },
 };
 
-const LOCK_BEFORE_KICKOFF_MS = 6 * 60 * 60 * 1000;
+const LOCK_BEFORE_KICKOFF_MS = 20 * 60 * 1000; // 20 minutes before match
 
 function isMatchLocked(m: Match, isAdmin = false): boolean {
   if (isAdmin) return false;

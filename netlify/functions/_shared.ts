@@ -117,7 +117,7 @@ export function isAdminPasswordValid(adminPassword?: string) {
   return !!adminPassword && adminPassword === expected;
 }
 
-export const LOCK_BEFORE_KICKOFF_MS = 6 * 60 * 60 * 1000;
+export const LOCK_BEFORE_KICKOFF_MS = 20 * 60 * 1000; // 20 minutes
 
 export function parseKickoffAtUtcFromLocalOffset(date?: string, time?: string): string | undefined {
   if (!date || !time) return undefined;
